@@ -2,64 +2,40 @@ import type { LaunchpadData } from "~/types";
 
 const launchpadApps: LaunchpadData[] = [
   {
-    id: "flint",
-    title: "Flint",
-    img: "img/icons/launchpad/flint.png",
-    link: "https://github.com/Renovamen/flint"
+    id: "vote4ash",
+    title: "Vote4Ash",
+    img: "img/icons/launchpad/vote4ash.svg",
+    link: "https://vote4ash.vercel.app/"
   },
   {
-    id: "oh-my-cv",
-    title: "Oh, My CV!",
-    img: "https://ohmycv.app/pwa-512x512.png",
-    link: "https://ohmycv.app"
+    id: "go2gether",
+    title: "Go2Gether",
+    img: "img/icons/launchpad/go2gether.svg",
+    link: "https://theashisharora.github.io/go2gether/"
   },
   {
-    id: "oh-vue-icons",
-    title: "Oh, Vue Icons!",
-    img: "img/icons/launchpad/oh-vue-icons.png",
-    link: "https://oh-vue-icons.js.org"
+    id: "portfolio",
+    title: "Portfolio",
+    img: "img/icons/launchpad/portfolio.svg",
+    link: "https://www.ashisharora.site/"
   },
   {
-    id: "gungnir",
-    title: "Gungnir",
-    img: "img/icons/launchpad/gungnir.png",
-    link: "https://vuepress-theme-gungnir.vercel.app/"
-  },
-  // {
-  //   id: "metallic",
-  //   title: "Metallic",
-  //   img: "img/icons/launchpad/meta.png",
-  //   link: "https://github.com/Renovamen/metallic"
-  // },
-  {
-    id: "what-if",
-    title: "My Notebook",
-    img: "img/icons/launchpad/notebook.png",
-    link: "https://note.zxh.io"
+    id: "portfolio-classic",
+    title: "Classic Portfolio",
+    img: "img/icons/launchpad/portfolio-classic.svg",
+    link: "https://theashisharora.github.io/portfolio/"
   },
   {
-    id: "cube",
-    title: "Cube Solver",
-    img: "img/icons/launchpad/cube.png",
-    link: "https://cube.zxh.io/"
+    id: "sanstype",
+    title: "SansType",
+    img: "img/icons/launchpad/sanstype.svg",
+    link: "https://arashish.dev.fast.sheridanc.on.ca/Co-op/TypeSans/"
   },
   {
     id: "resume",
     title: "Résumé",
-    img: "img/icons/launchpad/resume.png",
-    link: "https://resume.zxh.io/"
-  },
-  {
-    id: "zelda",
-    title: "Webpage for Zelda",
-    img: "img/icons/launchpad/zelda.png",
-    link: "https://zelda.zxh.io/"
-  },
-  {
-    id: "fishmail",
-    title: "Fishmail",
-    img: "img/icons/launchpad/fishmail.png",
-    link: "https://fishmail.vercel.app/"
+    img: "img/icons/launchpad/ashish-resume.svg",
+    link: "files/Ashish_Arora_Resume.pdf"
   }
 ];
 

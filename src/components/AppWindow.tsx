@@ -113,8 +113,16 @@ const Window = (props: WindowProps) => {
   const [state, setState] = useState<WindowState>({
     width: initWidth,
     height: initHeight,
-    // "+ winWidth" because of the boundary for windows
-    x: winWidth + (winWidth - initWidth) / 2 + (props.x || 0),
+    // "+ winWidth" because of the boundary for windows.
+    // The app's x offset is clamped so the window never starts partly off-screen
+    // (e.g. on phones, where the window is as wide as the screen).
+    x:
+      winWidth +
+      (winWidth - initWidth) / 2 +
+      Math.max(
+        -(winWidth - initWidth) / 2,
+        Math.min((winWidth - initWidth) / 2, props.x || 0)
+      ),
     // "- minMarginY" because of the boundary for windows
     y: (winHeight - initHeight - dockSize - minMarginY) / 2 + (props.y || 0)
   });

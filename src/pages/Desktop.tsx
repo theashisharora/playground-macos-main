@@ -1,6 +1,7 @@
 import React from "react";
 import { apps, wallpapers } from "~/configs";
 import { minMarginY } from "~/utils";
+import { player } from "~/player/controller";
 import type { MacActions } from "~/types";
 
 interface DesktopState {
@@ -74,6 +75,10 @@ export default function Desktop(props: MacActions) {
 
   useEffect(() => {
     getAppsData();
+    // Set up the shared music player (loads the default playlist paused; never autoplays).
+    player.init();
+    // Logging out / sleeping / shutting down leaves the desktop: stop the music.
+    return () => player.stop();
   }, []);
 
   const toggleLaunchpad = (target: boolean): void => {

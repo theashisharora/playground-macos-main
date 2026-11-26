@@ -66,6 +66,19 @@ const apps: AppsData[] = [
     content: <FaceTime />
   },
   {
+    id: "music",
+    title: "Music",
+    desktop: true,
+    width: 920,
+    height: 560,
+    minWidth: 320,
+    minHeight: 360,
+    x: 40,
+    y: -10,
+    img: "img/icons/music.svg",
+    content: <Music />
+  },
+  {
     id: "terminal",
     title: "Terminal",
     desktop: true,
@@ -77,7 +90,7 @@ const apps: AppsData[] = [
     title: "Github",
     desktop: false,
     img: "img/icons/github.png",
-    link: "https://github.com/Renovamen/playground-macos"
+    link: "https://github.com/theashisharora"
   }
 ];
 

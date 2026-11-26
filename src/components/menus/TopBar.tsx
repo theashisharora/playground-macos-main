@@ -1,7 +1,7 @@
 import React from "react";
 import { format } from "date-fns";
 import { isFullScreen } from "~/utils";
-import { music } from "~/configs";
+import { player } from "~/player/controller";
 import type { MacActions } from "~/types";
 
 interface TopBarItemProps {
@@ -76,15 +76,9 @@ const TopBar = (props: TopBarProps) => {
     showAppleMenu: false
   });
 
-  /* eslint-disable-next-line @typescript-eslint/no-unused-vars */
-  const [audio, audioState, controls, audioRef] = useAudio({
-    src: music.audio,
-    autoReplay: true
-  });
   const { winWidth, winHeight } = useWindowSize();
 
-  const { volume, wifi } = useStore((state) => ({
-    volume: state.volume,
+  const { wifi } = useStore((state) => ({
     wifi: state.wifi
   }));
   const { toggleFullScreen, setVolume, setBrightness } = useStore((state) => ({
@@ -102,7 +96,6 @@ const TopBar = (props: TopBarProps) => {
 
   useEffect(() => {
     props.setSpotlightBtnRef(spotlightBtnRef);
-    controls.volume(volume / 100);
   }, []);
 
   useEffect(() => {
@@ -110,9 +103,9 @@ const TopBar = (props: TopBarProps) => {
     toggleFullScreen(isFull);
   }, [winWidth, winHeight]);
 
+  // The shared music player follows the global volume (see src/player/controller.ts).
   const setAudioVolume = (value: number): void => {
     setVolume(value);
-    controls.volume(value / 100);
   };
 
   const setSiteBrightness = (value: number): void => {
@@ -141,22 +134,22 @@ const TopBar = (props: TopBarProps) => {
   };
 
   const logout = (): void => {
-    controls.pause();
+    player.stop();
     props.setLogin(false);
   };
 
   const shut = (e: React.MouseEvent<HTMLLIElement>): void => {
-    controls.pause();
+    player.stop();
     props.shutMac(e);
   };
 
   const restart = (e: React.MouseEvent<HTMLLIElement>): void => {
-    controls.pause();
+    player.stop();
     props.restartMac(e);
   };
 
   const sleep = (e: React.MouseEvent<HTMLLIElement>): void => {
-    controls.pause();
+    player.stop();
     props.sleepMac(e);
   };
 
@@ -232,8 +225,6 @@ const TopBar = (props: TopBarProps) => {
         {/* Open this when clicking on Control Center button */}
         {state.showControlCenter && (
           <ControlCenterMenu
-            playing={audioState.playing}
-            toggleAudio={controls.toggle}
             setVolume={setAudioVolume}
             setBrightness={setSiteBrightness}
             toggleControlCenter={toggleControlCenter}

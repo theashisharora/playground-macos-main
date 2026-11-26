@@ -342,7 +342,7 @@ export default class Terminal extends React.Component<{}, TerminalState> {
       <div key={`terminal-input-row-${id}`} flex>
         <div className="w-max hstack space-x-1.5">
           <span text-yellow-200>
-            zou@macbook-pro <span text-green-300>{this.getCurDirName()}</span>
+            ashish@macbook-pro <span text-green-300>{this.getCurDirName()}</span>
           </span>
           <span text-red-400>{">"}</span>
         </div>
@@ -359,7 +359,7 @@ export default class Terminal extends React.Component<{}, TerminalState> {
 
   generateResultRow = (id: number, result: JSX.Element) => {
     const newRow = (
-      <div key={`terminal-result-row-${id}`} break-all>
+      <div key={`terminal-result-row-${id}`} break-words>
         {result}
       </div>
     );
