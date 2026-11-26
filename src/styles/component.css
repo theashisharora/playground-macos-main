@@ -1,4 +1,35 @@
+/* --------- Accent (red keyword highlight) --------- */
+
+.accent {
+  @apply font-semibold text-red-500 dark:text-red-400;
+}
+
+/* Terminal always renders on a dark background */
+.font-terminal .accent {
+  @apply text-red-400;
+}
+
+/* --------- Control Center media buttons --------- */
+
+.cc-media-btn {
+  @apply flex-center size-8 rounded-full text-c-black no-outline;
+}
+
+.cc-media-btn:hover {
+  @apply bg-c-300/60;
+}
+
+.cc-media-btn:focus-visible {
+  @apply outline-2 outline-blue-500;
+  outline-style: solid;
+}
+
 /* --------- Login --------- */
+
+/* Keep white login text legible over bright wallpaper areas */
+.login {
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.55);
+}
 
 .login input::placeholder {
   @apply text-white;

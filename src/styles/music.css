@@ -1,0 +1,85 @@
+/* --------- Music app --------- */
+
+.music-app {
+  container-type: inline-size;
+}
+
+.music-app input[type="range"] {
+  accent-color: #f43f5e; /* rose-500 */
+}
+
+.music-range {
+  @apply h-1 cursor-pointer;
+}
+
+.music-range:disabled {
+  @apply cursor-default opacity-50;
+}
+
+.music-btn:hover:not(:disabled),
+.music-side-item:hover {
+  @apply bg-c-300/50;
+}
+
+.music-btn:disabled,
+.music-pill:disabled {
+  @apply opacity-40 cursor-default;
+}
+
+.music-pill:hover:not(:disabled) {
+  @apply brightness-110;
+}
+
+.music-app button:focus-visible,
+.music-app a:focus-visible,
+.music-app input:focus-visible,
+.music-app select:focus-visible {
+  @apply outline-2 outline-rose-500 outline-offset-1;
+  outline-style: solid;
+}
+
+.music-badge {
+  @apply shrink-0 rounded border border-rose-500/60 px-1 text-[9px] font-semibold uppercase leading-3.5 tracking-wide text-rose-500;
+}
+
+.music-compact-bar {
+  display: none;
+}
+
+/* Medium windows: drop the album column */
+@container (max-width: 760px) {
+  .music-col-album {
+    display: none;
+  }
+}
+
+/* Narrow windows / phones: no sidebar, stacked toolbar */
+@container (max-width: 620px) {
+  .music-sidebar {
+    display: none;
+  }
+
+  .music-compact-bar {
+    display: block;
+  }
+
+  .music-toolbar {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
+
+  .music-lcd {
+    order: -1;
+    flex-basis: 100%;
+    margin-left: 0 !important;
+  }
+
+  .music-volume {
+    margin-left: auto !important;
+  }
+
+  .music-cover {
+    width: 6rem;
+    height: 6rem;
+  }
+}

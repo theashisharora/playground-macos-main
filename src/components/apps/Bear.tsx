@@ -6,6 +6,7 @@ import rehypeExternalLinks from "rehype-external-links";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { dracula, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import bear from "~/configs/bear";
+import remarkAccent from "~/utils/remarkAccent";
 import type { BearMdData } from "~/types";
 
 interface ContentProps {
@@ -52,6 +53,19 @@ const Highlighter = (dark: boolean): any => {
         </SyntaxHighlighter>
       ) : (
         <code className={className}>{children}</code>
+      );
+    },
+    // Local files (e.g. the résumé PDF) open in a new tab instead of replacing the site
+    a({ node, href, children, ...props }: any) {
+      const isFile = typeof href === "string" && /\.pdf$/i.test(href);
+      return (
+        <a
+          href={href}
+          {...props}
+          {...(isFile && { target: "_blank", rel: "noopener noreferrer" })}
+        >
+          {children}
+        </a>
       );
     }
   };
@@ -174,7 +188,7 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
   return (
     <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkAccent]}
         rehypePlugins={[
           rehypeKatex,
           [rehypeExternalLinks, { target: "_blank", rel: "noopener noreferrer" }]
