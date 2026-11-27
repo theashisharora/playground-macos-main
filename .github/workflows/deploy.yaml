@@ -1,4 +1,7 @@
-name: build-and-deploy
+# CI only. The site is hosted on Vercel (which builds and deploys from the
+# connected GitHub repository), so this workflow NO LONGER publishes to GitHub
+# Pages. It only checks that the frontend builds and the Worker tests pass.
+name: ci
 
 on:
   push:
@@ -6,38 +9,32 @@ on:
   pull_request:
     branches: [ main ]
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+permissions:
+  contents: read
 
-    env:
-      NODE_VERSION: 20
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          # 22.6+ is required by the Worker tests (--experimental-strip-types).
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Build site
+        # No VITE_* values here: CI builds the browser-only preview mode.
         run: pnpm build
 
-      - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
+      - name: Worker tests
+        run: npm --prefix server/contact-worker test

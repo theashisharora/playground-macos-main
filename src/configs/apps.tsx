@@ -79,6 +79,20 @@ const apps: AppsData[] = [
     content: <Music />
   },
   {
+    id: "messages",
+    title: "Messages",
+    desktop: true,
+    launchpad: true,
+    width: 760,
+    height: 540,
+    minWidth: 320,
+    minHeight: 420,
+    x: -40,
+    y: -20,
+    img: "img/icons/messages.svg",
+    content: <Messages />
+  },
+  {
     id: "terminal",
     title: "Terminal",
     desktop: true,

@@ -1,0 +1,11 @@
+{
+  "name": "portfolio-contact-worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "npx wrangler@3.114.17 dev",
+    "dryrun": "npx wrangler@3.114.17 deploy --dry-run --outdir .wrangler/dry-run",
+    "test": "node --experimental-strip-types --no-warnings --test test/validation.test.ts test/handler.test.ts test/rateLimit.test.ts test/dedupe.test.ts test/gmail.test.ts test/smtp.test.ts test/chat.test.ts",
+    "typecheck": "npx tsc -p tsconfig.json --noEmit"
+  }
+}

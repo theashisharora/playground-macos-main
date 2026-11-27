@@ -1,7 +1,8 @@
 export interface BearMdData {
   id: string;
   title: string;
-  file: string;
+  /** Markdown file to render. Omit for pages registered as React components in Bear.tsx. */
+  file?: string;
   icon: string;
   excerpt: string;
   link?: string;

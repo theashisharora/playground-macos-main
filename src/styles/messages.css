@@ -1,0 +1,321 @@
+/* --------- Messages app --------- */
+
+.messages-app {
+  @apply size-full text-c-800 bg-white dark:bg-[#1e1e1e];
+  /* The layout responds to the WINDOW's width, not the viewport's. */
+  container-type: inline-size;
+}
+
+.msg-layout {
+  @apply flex size-full;
+}
+
+.msg-sidebar {
+  @apply flex flex-col w-60 shrink-0 p-2 bg-gray-100/90 dark:bg-[#262626] border-r border-c-300;
+}
+
+.msg-sidebar-title {
+  @apply px-2 pt-1 pb-3 text-xs font-semibold text-c-500 uppercase tracking-wide;
+}
+
+.msg-convo-list {
+  @apply flex flex-col gap-1;
+}
+
+.msg-convo {
+  @apply flex items-center gap-2.5 w-full text-left rounded-lg px-2 py-2 text-c-800
+    hover:bg-black/5 dark:hover:bg-white/8
+    focus-visible:(outline-2 outline-offset-1 outline-[#007aff]);
+}
+
+.msg-convo-active,
+.msg-convo-active:hover {
+  @apply text-white bg-[#0a84ff];
+}
+
+.msg-convo-body {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+.msg-convo-time {
+  @apply text-xs opacity-75 shrink-0;
+}
+
+.msg-convo-sub {
+  @apply text-[11px] opacity-75;
+}
+
+.msg-convo-preview {
+  @apply text-xs opacity-80 line-clamp-2;
+}
+
+.msg-avatar {
+  @apply rounded-full object-cover shrink-0;
+}
+
+.msg-main {
+  @apply flex flex-col flex-1 min-w-0;
+}
+
+/* `display: flex` above would otherwise override the hidden attribute. */
+.msg-main[hidden],
+.msg-turnstile[hidden] {
+  display: none !important;
+}
+
+.msg-header {
+  @apply flex items-center gap-2 px-4 h-12 shrink-0 border-b border-c-300 bg-gray-50/90 dark:bg-[#2a2a2a];
+}
+
+/* ---- Ashish AI ---- */
+
+.msg-ai-avatar {
+  @apply inline-flex items-center justify-center rounded-full shrink-0 text-white;
+  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 55%, #ec4899 100%);
+}
+
+.msg-row-in > .msg-ai-avatar {
+  align-self: flex-end;
+}
+
+.msg-ai-pill {
+  @apply shrink-0 px-1.5 rounded text-[10px] font-bold leading-4 tracking-wide
+    bg-violet-500/15 text-violet-700 dark:text-violet-300;
+}
+
+.msg-convo-active .msg-ai-pill {
+  @apply bg-white/25 text-white;
+}
+
+.msg-ai-group {
+  @apply space-y-0.5;
+}
+
+.msg-ai-caption {
+  @apply flex items-center gap-1 ml-9 text-[11px] text-c-500;
+}
+
+.msg-ai-caption > span {
+  @apply text-violet-500 dark:text-violet-300;
+}
+
+.msg-bubble-ai {
+  @apply ring-1 ring-violet-400/35 dark:ring-violet-300/25;
+}
+
+.msg-contact-btn {
+  @apply inline-flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-full text-xs font-medium
+    text-[#007aff] bg-[#007aff]/10 hover:bg-[#007aff]/15 dark:(text-[#0a84ff] bg-[#0a84ff]/15)
+    focus-visible:(outline-2 outline-offset-2 outline-[#007aff]);
+}
+
+.msg-suggestions {
+  @apply flex flex-wrap gap-1.5 pl-9 pt-1;
+}
+
+.msg-chip {
+  @apply inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-full border text-left
+    border-[#007aff]/40 text-[#007aff] hover:bg-[#007aff]/8
+    dark:(border-[#0a84ff]/45 text-[#4da3ff]) disabled:opacity-50
+    focus-visible:(outline-2 outline-offset-2 outline-[#007aff]);
+}
+
+.msg-chip-contact {
+  @apply border-transparent bg-[#007aff]/10 dark:bg-[#0a84ff]/15;
+}
+
+.msg-thinking {
+  @apply flex items-center gap-1 py-3;
+}
+
+.msg-dot {
+  @apply size-1.5 rounded-full bg-current opacity-50;
+  animation: msg-dot 1.2s infinite ease-in-out;
+}
+
+.msg-dot:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.msg-dot:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+@keyframes msg-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 0.9;
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .msg-dot {
+    animation: none;
+  }
+}
+
+/* ---- Narrow windows (phones, or a resized window): conversations on top ---- */
+
+@container (max-width: 560px) {
+  .msg-layout {
+    flex-direction: column;
+  }
+  .msg-sidebar {
+    @apply w-full flex-row p-1.5 border-r-0 border-b;
+  }
+  .msg-sidebar-title,
+  .msg-convo-preview,
+  .msg-convo-sub,
+  .msg-convo-time {
+    display: none;
+  }
+  .msg-convo-list {
+    @apply flex-row flex-1 gap-1.5;
+  }
+  .msg-convo {
+    @apply flex-1 justify-center gap-2 py-1.5;
+  }
+  .msg-convo-body {
+    flex: 0 1 auto;
+  }
+  .msg-convo .msg-avatar,
+  .msg-convo .msg-ai-avatar {
+    @apply size-7 text-sm;
+  }
+  .msg-main {
+    min-height: 0;
+  }
+}
+
+@container (max-width: 340px) {
+  .msg-contact-label {
+    display: none;
+  }
+  .msg-contact-btn {
+    @apply px-2 py-1.5;
+  }
+}
+
+.msg-preview-badge {
+  @apply ml-auto text-[11px] font-medium px-2 py-0.5 rounded-full
+    bg-amber-100 text-amber-800 dark:(bg-amber-400/15 text-amber-300);
+}
+
+.msg-transcript {
+  @apply flex-1 overflow-y-auto px-3 sm:px-5 py-4 space-y-2;
+}
+
+.msg-timestamp {
+  @apply text-center text-[11px] text-c-500 pb-2;
+}
+
+.msg-row-in {
+  @apply flex items-end gap-2 max-w-[85%] sm:max-w-[75%];
+}
+
+.msg-row-out {
+  @apply flex flex-col items-end ml-auto max-w-[85%] sm:max-w-[75%];
+}
+
+.msg-bubble {
+  @apply px-3.5 py-2 text-sm leading-snug rounded-2xl whitespace-pre-wrap break-words;
+}
+
+.msg-bubble-in {
+  @apply rounded-bl-md bg-[#e9e9eb] text-black dark:(bg-[#3a3a3c] text-white);
+}
+
+.msg-bubble-out {
+  @apply rounded-br-md bg-[#007aff] text-white dark:bg-[#0a84ff] transition-opacity;
+}
+
+.msg-bubble-failed {
+  @apply bg-[#007aff]/60 dark:bg-[#0a84ff]/60;
+}
+
+.msg-status {
+  @apply flex flex-wrap items-center justify-end gap-x-1.5 gap-y-0.5 mt-1 text-[11px] text-c-500;
+}
+
+.msg-status-failed {
+  @apply text-red-600 dark:text-red-400;
+}
+
+.msg-status-detail {
+  @apply basis-full text-right text-c-500;
+}
+
+.msg-retry {
+  @apply font-semibold text-[#007aff] dark:text-[#0a84ff] hover:underline
+    focus-visible:(outline-2 outline-offset-2 outline-[#007aff]) rounded disabled:opacity-50;
+}
+
+.msg-composer {
+  @apply shrink-0 px-3 sm:px-4 pt-2 pb-2.5 space-y-2 border-t border-c-300 bg-gray-50/90 dark:bg-[#2a2a2a];
+}
+
+.msg-fields {
+  @apply grid gap-2 grid-cols-1 sm:grid-cols-2;
+}
+
+.msg-field {
+  @apply min-w-0;
+}
+
+.msg-input,
+.msg-textarea {
+  @apply w-full text-sm text-c-800 rounded-lg border border-c-300 bg-white dark:bg-[#1e1e1e]
+    placeholder:text-c-400 outline-none transition-shadow
+    focus:(border-[#007aff] ring-3 ring-[#007aff]/25)
+    disabled:opacity-60;
+}
+
+.msg-input {
+  @apply h-8 px-2.5;
+}
+
+.msg-input[aria-invalid="true"],
+.msg-textarea[aria-invalid="true"] {
+  @apply border-red-500 focus:ring-red-500/25;
+}
+
+.msg-compose-row {
+  @apply flex items-end gap-2;
+}
+
+.msg-textarea {
+  @apply block flex-1 min-w-0 resize-none rounded-[18px] px-3.5 py-1.5 leading-5 max-h-32 overflow-y-auto;
+}
+
+.msg-send {
+  @apply size-8 shrink-0 rounded-full flex-center text-white bg-[#007aff] dark:bg-[#0a84ff]
+    transition-opacity disabled:(opacity-40 cursor-not-allowed)
+    focus-visible:(outline-2 outline-offset-2 outline-[#007aff]);
+}
+
+.msg-field-error {
+  @apply mt-1 text-xs text-red-600 dark:text-red-400;
+}
+
+.msg-footer {
+  @apply flex items-start justify-between gap-3 text-[11px] leading-snug text-c-500;
+}
+
+.msg-turnstile {
+  @apply min-h-[65px];
+}
+
+/* Off-screen rather than display:none, which some bots detect. */
+.msg-hp {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

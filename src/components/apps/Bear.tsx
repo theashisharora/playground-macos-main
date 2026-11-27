@@ -8,6 +8,12 @@ import { dracula, prism } from "react-syntax-highlighter/dist/esm/styles/prism";
 import bear from "~/configs/bear";
 import remarkAccent from "~/utils/remarkAccent";
 import type { BearMdData } from "~/types";
+import DeveloperSnapshot from "./DeveloperSnapshot";
+
+// Bear pages rendered as React components instead of fetched markdown
+const customPages: Record<string, () => JSX.Element> = {
+  "developer-snapshot": DeveloperSnapshot
+};
 
 interface ContentProps {
   contentID: string;
@@ -74,21 +80,22 @@ const Highlighter = (dark: boolean): any => {
 const Sidebar = ({ cur, setMidBar }: SidebarProps) => {
   return (
     <div text-white>
-      <div className="h-12 pr-3 hstack space-x-3 justify-end">
+      <div className="h-12 pr-3 hidden sm:flex items-center space-x-3 justify-end">
         <span className="i-ic:baseline-cloud-off text-xl" />
         <span className="i-akar-icons:settings-vertical text-xl" />
       </div>
-      <ul>
+      <ul className="pt-3 sm:pt-0">
         {bear.map((item, index) => (
           <li
             key={`bear-sidebar-${item.id}`}
-            className={`pl-6 h-8 hstack cursor-default ${
+            title={item.title}
+            className={`h-8 hstack justify-center sm:(justify-start pl-6) cursor-default ${
               cur === index ? "bg-red-500" : "bg-transparent"
             } ${cur === index ? "" : "hover:bg-gray-600"}`}
             onClick={() => setMidBar(item.md, index)}
           >
             <span className={item.icon} />
-            <span className="ml-2">{item.title}</span>
+            <span className="ml-2 hidden sm:inline">{item.title}</span>
           </li>
         ))}
       </ul>
@@ -102,18 +109,21 @@ const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
       {items.map((item: BearMdData, index: number) => (
         <li
           key={`bear-midbar-${item.id}`}
-          className={`h-24 flex flex-col cursor-default border-l-2 ${
+          className={`h-auto py-1 sm:(h-24 py-0) flex flex-col cursor-default border-l-2 ${
             cur === index
               ? "border-red-500 bg-white dark:bg-gray-900"
               : "border-transparent bg-transparent"
           } hover:(bg-white dark:bg-gray-900)`}
-          onClick={() => setContent(item.id, item.file, index)}
+          onClick={() => setContent(item.id, item.file ?? "", index)}
         >
-          <div className="h-8 mt-3 hstack">
-            <div className="-mt-1 w-10 vstack text-c-500">
+          <div className="min-h-8 sm:(h-8 mt-3) hstack">
+            <div className="-mt-1 w-7 sm:w-10 vstack shrink-0 text-c-500">
               <span className={item.icon} />
             </div>
-            <span className="relative flex-1 font-bold" text="gray-900 dark:gray-100">
+            <span
+              className="relative flex-1 font-bold text-xs leading-tight pr-1 sm:(text-base leading-normal pr-0)"
+              text="gray-900 dark:gray-100"
+            >
               {item.title}
               {item.link && (
                 <a
@@ -127,7 +137,12 @@ const Middlebar = ({ items, cur, setContent }: MiddlebarProps) => {
               )}
             </span>
           </div>
-          <div className="flex-1 ml-10" p="b-2 r-1" text="sm c-500" border="b c-300">
+          <div
+            className="hidden sm:block flex-1 ml-10"
+            p="b-2 r-1"
+            text="sm c-500"
+            border="b c-300"
+          >
             {item.excerpt}
           </div>
         </li>
@@ -181,12 +196,16 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
     [storeMd]
   );
 
+  const CustomPage = customPages[contentID];
+
   useEffect(() => {
-    fetchMarkdown(contentID, contentURL);
-  }, [contentID, contentURL, fetchMarkdown]);
+    if (!CustomPage) fetchMarkdown(contentID, contentURL);
+  }, [CustomPage, contentID, contentURL, fetchMarkdown]);
+
+  if (CustomPage) return <CustomPage />;
 
   return (
-    <div className="markdown w-2/3 mx-auto px-2 py-6 text-c-700">
+    <div className="markdown w-full sm:w-2/3 mx-auto px-4 sm:px-2 py-6 text-c-700">
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath, remarkAccent]}
         rehypePlugins={[
@@ -207,7 +226,7 @@ const Bear = () => {
     curMidbar: 0,
     midbarList: bear[0].md,
     contentID: bear[0].md[0].id,
-    contentURL: bear[0].md[0].file
+    contentURL: bear[0].md[0].file ?? ""
   });
 
   const setMidBar = (items: BearMdData[], index: number) => {
@@ -216,7 +235,7 @@ const Bear = () => {
       curMidbar: 0,
       midbarList: items,
       contentID: items[0].id,
-      contentURL: items[0].file
+      contentURL: items[0].file ?? ""
     });
   };
 
@@ -231,17 +250,21 @@ const Bear = () => {
 
   return (
     <div className="bear font-avenir flex h-full">
-      <div className="w-44 overflow-auto bg-gray-700">
+      <div className="w-11 sm:w-44 shrink-0 overflow-auto bg-gray-700">
         <Sidebar cur={state.curSidebar} setMidBar={setMidBar} />
       </div>
-      <div className="w-60 overflow-auto" bg="gray-50 dark:gray-800" border="r c-300">
+      <div
+        className="w-26 sm:w-60 shrink-0 overflow-auto"
+        bg="gray-50 dark:gray-800"
+        border="r c-300"
+      >
         <Middlebar
           items={state.midbarList}
           cur={state.curMidbar}
           setContent={setContent}
         />
       </div>
-      <div className="flex-1 overflow-auto" bg="gray-50 dark:gray-800">
+      <div className="flex-1 min-w-0 overflow-auto" bg="gray-50 dark:gray-800">
         <Content contentID={state.contentID} contentURL={state.contentURL} />
       </div>
     </div>

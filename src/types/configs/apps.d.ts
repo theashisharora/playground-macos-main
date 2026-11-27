@@ -13,4 +13,6 @@ export interface AppsData {
   y?: number;
   content?: JSX.Element;
   link?: string;
+  /** Also show this desktop app in Launchpad (opens the window). */
+  launchpad?: boolean;
 }

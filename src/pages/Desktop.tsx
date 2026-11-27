@@ -166,7 +166,18 @@ export default function Desktop(props: MacActions) {
     });
   };
 
-  const openApp = (id: string): void => {
+  const openApp = (id: string, opts: { closeLaunchpad?: boolean } = {}): void => {
+    // Close Launchpad in the same state update (separate setState calls from
+    // one render would overwrite each other).
+    const launchpadPatch = opts.closeLaunchpad ? { showLaunchpad: false } : {};
+    if (opts.closeLaunchpad) {
+      const lp = document.querySelector(`#launchpad`) as HTMLElement | null;
+      if (lp) {
+        lp.style.transform = "scale(1.1)";
+        lp.style.transition = "ease-out 0.2s";
+      }
+    }
+
     // add it to the shown app list
     const showApps = state.showApps;
     showApps[id] = true;
@@ -189,7 +200,8 @@ export default function Desktop(props: MacActions) {
       showApps: showApps,
       appsZ: appsZ,
       maxZ: maxZ,
-      currentTitle: currentApp.title
+      currentTitle: currentApp.title,
+      ...launchpadPatch
     });
 
     const minApps = state.minApps;
@@ -203,7 +215,7 @@ export default function Desktop(props: MacActions) {
       r.style.transition = "ease-in 0.3s";
       // remove it from the minimized app list
       minApps[id] = false;
-      setState({ ...state, minApps });
+      setState({ ...state, minApps, ...launchpadPatch });
     }
   };
 
@@ -276,7 +288,11 @@ export default function Desktop(props: MacActions) {
       )}
 
       {/* Launchpad */}
-      <Launchpad show={state.showLaunchpad} toggleLaunchpad={toggleLaunchpad} />
+      <Launchpad
+        show={state.showLaunchpad}
+        toggleLaunchpad={toggleLaunchpad}
+        openApp={(id) => openApp(id, { closeLaunchpad: true })}
+      />
 
       {/* Dock */}
       <Dock

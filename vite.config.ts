@@ -6,6 +6,8 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  // Served from the domain root on Vercel.
+  base: "/",
   plugins: [
     unocss(),
     react(),
