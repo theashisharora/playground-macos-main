@@ -1,0 +1,20 @@
+# Copy to .dev.vars for `wrangler dev` (local only; .dev.vars is git-ignored).
+# Leave both modes on mock to test without sending email or calling Gemini.
+CONTACT_MODE=mock
+CHAT_MODE=mock
+# Local dev origins (wrangler.toml only allows the exact Vercel production origin)
+ALLOWED_ORIGINS=http://localhost:5173,http://localhost:4173
+
+# Email provider: "smtp" (Gmail SMTP + App Password), "gmail" (OAuth) or "resend"
+EMAIL_PROVIDER=smtp
+CONTACT_TO_EMAIL=
+SMTP_USERNAME=
+SMTP_APP_PASSWORD=
+
+# Ashish AI
+GEMINI_API_KEY=
+# 32+ random characters, e.g. from: node -e "console.log(crypto.randomBytes(32).toString('base64url'))"
+CHAT_SESSION_SECRET=
+
+# Cloudflare's documented always-pass test secret, for local development only:
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA

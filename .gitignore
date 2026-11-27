@@ -3,3 +3,10 @@
 .cache/
 node_modules/
 dist/
+
+# Local secrets (contact worker / Vite)
+.dev.vars
+.wrangler/
+.env
+.env.*
+!.env.example

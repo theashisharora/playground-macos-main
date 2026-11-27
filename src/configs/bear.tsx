@@ -15,11 +15,10 @@ const bear: BearData[] = [
           "Hey, I'm Ashish, a full-stack developer who builds software that tells a story..."
       },
       {
-        id: "github-stats",
-        title: "Github Stats",
-        file: "markdown/github-stats.md",
-        icon: "i-icon-park-outline:github",
-        excerpt: "A quick look at my GitHub activity and top languages..."
+        id: "developer-snapshot",
+        title: "Developer Snapshot",
+        icon: "i-ri:id-card-line",
+        excerpt: "Role, education, skills and featured projects at a glance..."
       },
       {
         id: "about-site",

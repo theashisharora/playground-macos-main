@@ -1,22 +1,39 @@
-import { wallpapers, launchpadApps } from "~/configs";
+import { wallpapers, launchpadApps, apps } from "~/configs";
 
 interface LaunchpadProps {
   show: boolean;
   toggleLaunchpad: (target: boolean) => void;
+  openApp: (id: string) => void;
 }
+
+interface LaunchpadEntry {
+  id: string;
+  title: string;
+  img: string;
+  link?: string;
+  appId?: string;
+}
+
+// Built-in desktop apps flagged for Launchpad come first, then external links.
+const entries: LaunchpadEntry[] = [
+  ...apps
+    .filter((a) => a.launchpad && a.desktop)
+    .map((a) => ({ id: a.id, title: a.title, img: a.img, appId: a.id })),
+  ...launchpadApps
+];
 
 const placeholderText = "Search";
 
-export default function Launchpad({ show, toggleLaunchpad }: LaunchpadProps) {
+export default function Launchpad({ show, toggleLaunchpad, openApp }: LaunchpadProps) {
   const dark = useStore((state) => state.dark);
 
   const [searchText, setSearchText] = useState("");
   const [focus, setFocus] = useState(false);
 
   const search = () => {
-    if (searchText === "") return launchpadApps;
+    if (searchText === "") return entries;
     const text = searchText.toLowerCase();
-    const list = launchpadApps.filter((item) => {
+    const list = entries.filter((item) => {
       return (
         item.title.toLowerCase().includes(text) || item.id.toLowerCase().includes(text)
       );
@@ -64,15 +81,28 @@ export default function Launchpad({ show, toggleLaunchpad }: LaunchpadProps) {
         >
           {search().map((app) => (
             <div key={`launchpad-${app.id}`} h="32 sm:36" flex="~ col">
-              <a
-                className="w-14 sm:w-20 mx-auto"
-                href={app.link}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <img src={app.img} alt={app.title} title={app.title} />
-              </a>
+              {app.appId ? (
+                <button
+                  type="button"
+                  className="w-14 sm:w-20 mx-auto"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openApp(app.appId as string);
+                  }}
+                >
+                  <img src={app.img} alt={app.title} title={app.title} />
+                </button>
+              ) : (
+                <a
+                  className="w-14 sm:w-20 mx-auto"
+                  href={app.link}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <img src={app.img} alt={app.title} title={app.title} />
+                </a>
+              )}
               <span m="t-2 x-auto" text="white xs sm:sm">
                 {app.title}
               </span>

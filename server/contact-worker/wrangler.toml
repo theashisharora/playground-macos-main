@@ -1,0 +1,88 @@
+# Cloudflare Worker behind the Messages app:
+#   POST /contact  -> emails Ashish via Gmail SMTP (App Password, TLS :465)
+#   POST /chat     -> "Ashish AI", a Gemini assistant limited to portfolio facts
+# Secrets are NOT stored here. Set them with `wrangler secret put <NAME>`
+# (see DEPLOY-CHECKLIST.md). This file is safe to commit: no variable below may
+# share a name with a secret (a same-named variable REPLACES the secret on deploy).
+#
+# Both modes stay "mock" in this file. For the controlled live test, switch them
+# per deploy with `--var CHAT_MODE:live` / `--var CONTACT_MODE:live` (see checklist),
+# so a plain `wrangler deploy` always returns to safe mock mode.
+
+name = "portfolio-contact"
+main = "src/worker.ts"
+compatibility_date = "2024-09-23"
+
+[vars]
+# "mock" = accept and validate messages but send nothing (responses say delivered:false).
+# Switch to "live" only after every secret below is set and an end-to-end test passes.
+CONTACT_MODE = "mock"
+# Exact browser ORIGINS allowed to call the API: comma-separated, scheme + host,
+# no path, no trailing slash, exact match only (no wildcards).
+# TODO before the first live test: set this to the Vercel PRODUCTION origin shown
+# in Vercel -> Project -> Domains after the project is created, for example
+#   ALLOWED_ORIGINS = "https://<your-production-domain>.vercel.app"
+# Left empty on purpose: until it is set, every browser call to /chat and
+# /contact is refused (403) - fail closed. Vercel preview deployments are NOT
+# listed; they run in browser-only preview mode (see DEPLOY-CHECKLIST.md).
+# Local dev origins come from .dev.vars.
+ALLOWED_ORIGINS = ""
+# "smtp"   = Gmail SMTP with a Google App Password (recommended; no domain needed)
+# "gmail"  = Gmail API with OAuth 2.0 (kept as an alternative)
+# "resend" = Resend (needs a verified domain)
+EMAIL_PROVIDER = "smtp"
+# Gmail SMTP over implicit TLS. Port 465 only (587/STARTTLS is refused by the Worker).
+SMTP_HOST = "smtp.gmail.com"
+SMTP_PORT = "465"
+# Display name on the notification. The sender ADDRESS is always SMTP_USERNAME.
+CONTACT_FROM_NAME = "Ashish's Portfolio"
+# Only for EMAIL_PROVIDER = "resend" / "gmail":
+# CONTACT_FROM_EMAIL = "Ashish's Portfolio <contact@your-verified-domain.com>"
+
+# Ashish AI. "mock" returns a clearly labelled preview reply and never calls Gemini.
+CHAT_MODE = "mock"
+# Stable model, verified with the live ListModels API on 2026-11-26.
+GEMINI_MODEL = "gemini-3.5-flash-lite"
+# Global cap on AI replies per rolling 24 hours. Must stay BELOW the project's
+# requests-per-day for this model (AI Studio -> Rate limit). Per-visitor limits
+# (10 per 10 min, 40 per day) are fixed in code.
+CHAT_DAILY_LIMIT = "300"
+
+# Secrets (set with wrangler, never commit):
+#   CONTACT_TO_EMAIL      - your inbox, e.g. you@gmail.com
+#   TURNSTILE_SECRET_KEY  - Cloudflare Turnstile secret key (contact + chat)
+#   SMTP_USERNAME         - the Gmail address that sends    (EMAIL_PROVIDER = "smtp")
+#   SMTP_APP_PASSWORD     - Google App Password, NOT your account password (smtp)
+#   GMAIL_CLIENT_ID       - Google OAuth client id         (EMAIL_PROVIDER = "gmail")
+#   GMAIL_CLIENT_SECRET   - Google OAuth client secret     (EMAIL_PROVIDER = "gmail")
+#   GMAIL_REFRESH_TOKEN   - refresh token, gmail.send only (EMAIL_PROVIDER = "gmail")
+#   RESEND_API_KEY        - Resend API key                 (EMAIL_PROVIDER = "resend")
+#   GEMINI_API_KEY        - Gemini API key                 (CHAT_MODE = "live")
+#   CHAT_SESSION_SECRET   - 32+ random characters          (CHAT_MODE = "live")
+
+# Global per-IP contact limit (5 messages / 10 minutes) and the duplicate-send
+# ledger. One SQLite-backed Durable Object per visitor IP / message id, shared by
+# every Worker instance and location. Available on the Workers Free plan. Live
+# mode refuses to run without this binding.
+[[durable_objects.bindings]]
+name = "CONTACT_RATE_LIMITER_DO"
+class_name = "ContactRateLimiter"
+
+# Ashish AI limits live in a SEPARATE class/namespace, so chat traffic can never
+# use up the contact form's quota. Live chat refuses to run without it.
+[[durable_objects.bindings]]
+name = "CHAT_RATE_LIMITER_DO"
+class_name = "ChatRateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ContactRateLimiter"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ChatRateLimiter"]
+
+# Not used: the Workers Rate Limiting binding ([[ratelimits]]) counts per
+# Cloudflare location, is approximate, and only supports 10 s / 60 s periods,
+# so it can't enforce "5 per 10 minutes" globally. The code still supports a
+# binding named CONTACT_RATE_LIMITER as a fallback if the Durable Object is absent.
