@@ -1,5 +1,5 @@
 /**
- * "Ashish AI" chat rules shared by the Messages app (browser) and the Worker
+ * "Ash AI" chat rules shared by the Messages app (browser) and the Worker
  * (server). The server always re-checks everything; the browser copy only
  * gives instant feedback.
  *

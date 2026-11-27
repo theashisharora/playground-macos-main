@@ -1,5 +1,5 @@
 // HMAC-SHA256 helpers (Web Crypto, available in Workers and Node 22).
-// Used for Ashish AI sessions and for signing assistant replies, so a visitor
+// Used for Ash AI sessions and for signing assistant replies, so a visitor
 // can't forge "assistant" turns in the history they send back.
 
 const enc = new TextEncoder();

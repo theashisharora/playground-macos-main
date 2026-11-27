@@ -11,7 +11,7 @@ CONTACT_TO_EMAIL=
 SMTP_USERNAME=
 SMTP_APP_PASSWORD=
 
-# Ashish AI
+# Ash AI
 GEMINI_API_KEY=
 # 32+ random characters, e.g. from: node -e "console.log(crypto.randomBytes(32).toString('base64url'))"
 CHAT_SESSION_SECRET=

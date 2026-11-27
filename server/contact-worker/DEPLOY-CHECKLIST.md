@@ -18,11 +18,14 @@ Nothing here puts a secret on a command line, in a file, in Vercel, or in Git.
 
 Safety rules:
 
-- `wrangler.toml` keeps `CONTACT_MODE = "mock"` and `CHAT_MODE = "mock"`. Live
-  mode is turned on **per deploy** with `--var`, so a plain deploy rolls back to
-  mock.
-- `ALLOWED_ORIGINS` is empty until the exact Vercel production origin is known.
-  An empty list refuses every browser call.
+- **Now in production:** the Worker is `portfolio-macos` and both services are
+  live, and `wrangler.toml` matches that (`CONTACT_MODE = "live"`,
+  `CHAT_MODE = "live"`), so a plain `npx wrangler@3.114.17 deploy` keeps them
+  live. Sections 4–10 below describe the original first-time setup, which used
+  mock mode plus `--var` flags; to fall back to mock for one deploy, use
+  `--var CHAT_MODE:mock --var CONTACT_MODE:mock`.
+- `ALLOWED_ORIGINS` lists only exact Vercel production origins. An empty list
+  refuses every browser call.
 - Commands use the pinned Wrangler version `3.114.17`.
 
 ---
@@ -111,7 +114,7 @@ $env:CLOUDFLARE_API_TOKEN = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
   [Runtime.InteropServices.Marshal]::SecureStringToBSTR($t)); Remove-Variable t
 npx wrangler@3.114.17 whoami
 npx wrangler@3.114.17 deploy                       # mock mode; prints the Worker URL
-$W = "https://portfolio-contact.<subdomain>.workers.dev"
+$W = "https://portfolio-macos.<subdomain>.workers.dev"
 Invoke-RestMethod "$W/health"                      # mode=mock, chat.mode=mock
 ```
 
@@ -146,7 +149,7 @@ Vite reads them **at build time**, so trigger a new production deployment:
 Deployments → latest production → **Redeploy**.
 
 Check the result: open the production URL → Messages, and confirm there are no
-CORS errors in DevTools. Ashish AI shows a labelled preview reply, and the
+CORS errors in DevTools. Ash AI shows a labelled preview reply, and the
 contact form shows "Preview only · not sent".
 
 ## 7. Why previews and development stay restricted
@@ -167,7 +170,7 @@ contact form shows "Preview only · not sent".
    never used.
 3. Enter it only at the `secret put SMTP_APP_PASSWORD` prompt in step 5.
 
-## 9. Controlled live test #1: Ashish AI 💻
+## 9. Controlled live test #1: Ash AI 💻
 
 ```powershell
 npx wrangler@3.114.17 deploy --var CHAT_MODE:live
@@ -199,10 +202,51 @@ Send **one** message, using a second address you control as the visitor:
 
 ## 11. Roll back or keep live
 
-- **Roll back to mock:** `npx wrangler@3.114.17 deploy`. Secrets are kept.
-- **Keep live:** keep deploying with both `--var` flags, or (later) set both
-  modes to `"live"` in `wrangler.toml` and commit.
+- **Keep live (current setup):** `npx wrangler@3.114.17 deploy`. Both modes are
+  `"live"` in `wrangler.toml`. Secrets are kept.
+- **Roll back to mock:**
+  `npx wrangler@3.114.17 deploy --var CHAT_MODE:mock --var CONTACT_MODE:mock`.
 - **End the session:** `Remove-Item Env:CLOUDFLARE_API_TOKEN`.
+
+## 12. Move `ashisharora.vercel.app` to the macOS portfolio 🧑💻
+
+`ashisharora.vercel.app` belongs to the **previous** portfolio's Vercel project.
+Renaming a project does not move its domain, and a `*.vercel.app` address can
+only belong to one project at a time, so it has to be released by the old
+project and then added to the new one. The macOS portfolio keeps working at
+`portfolio-macos-psi.vercel.app` the whole time.
+
+1. **Worker first** 💻: `wrangler.toml` already allows both origins and keeps
+   both services live, and its name is the production Worker `portfolio-macos`:
+   ```powershell
+   npx wrangler@3.114.17 deploy
+   ```
+   Check `/health`: `ready: true` and `chat.ready: true`.
+2. **Turnstile** 🧑: Cloudflare → Turnstile → your widget → **Hostname
+   management** → add `ashisharora.vercel.app`. Keep
+   `portfolio-macos-psi.vercel.app` and `localhost`.
+3. **Check the old project** 🧑: Vercel → the previous portfolio project →
+   Settings → Domains. Note every domain it serves (for example
+   `ashisharora.site` and `www.ashisharora.site`). Leave the custom domains
+   where they are; only `ashisharora.vercel.app` moves.
+4. **Release it from the old project** 🧑: on `ashisharora.vercel.app`, choose
+   **Edit** and change it to a new name, for example
+   `ashisharora-classic.vercel.app` (keeps the old site online under that
+   name), or **Remove** it. From here until step 5 the address shows
+   Vercel's 404, so do steps 4 and 5 together.
+5. **Add it to the new project** 🧑: Vercel → `portfolio` (macOS) → Settings →
+   Domains → **Add** → `ashisharora.vercel.app` → Production. Keep
+   `portfolio-macos-psi.vercel.app`.
+6. **Redeploy** 🧑: Deployments → latest Production → **Redeploy**, so the
+   canonical and social-sharing tags in `index.html` (which name
+   `https://ashisharora.vercel.app/`) are what's served there.
+7. **Verify** 🧑💻: on both addresses, open Messages, ask Ash AI one
+   question, and send one contact message.
+8. **Later** (optional): remove `https://portfolio-macos-psi.vercel.app` from
+   `ALLOWED_ORIGINS` and Turnstile, then deploy with both live flags.
+
+**Rollback:** remove the domain from the new project and add it back to the old
+one (step 5, then step 4 in reverse).
 
 ## Changing secrets later (no code change)
 
@@ -218,5 +262,5 @@ immediately, for example `GEMINI_API_KEY` when you rotate it, or
 | Messages still says "Preview mode" on production | `VITE_*` variables were added after the build. Redeploy in Vercel. |
 | AI asks to "complete the verification" repeatedly | The Turnstile widget hostnames don't include the Vercel domain. |
 | `/health` shows `ready: false` | A secret, binding or `ALLOWED_ORIGINS` is missing. The tail lists the names. |
-| "Ashish AI is busy" | Gemini returned 429: the free-tier quota is used up. |
+| "Ash AI is busy" | Gemini returned 429: the free-tier quota is used up. |
 | `SMTP AUTH rejected: 535` | Wrong or revoked App Password. |

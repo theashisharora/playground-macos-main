@@ -3,6 +3,10 @@ import { apps, wallpapers } from "~/configs";
 import { minMarginY } from "~/utils";
 import { player } from "~/player/controller";
 import type { MacActions } from "~/types";
+import { SHOW_AI_EVENT } from "~/configs/assistant";
+import WelcomeNotification, {
+  markWelcomeNotificationShown
+} from "~/components/WelcomeNotification";
 
 interface DesktopState {
   showApps: {
@@ -80,6 +84,12 @@ export default function Desktop(props: MacActions) {
     // Logging out / sleeping / shutting down leaves the desktop: stop the music.
     return () => player.stop();
   }, []);
+
+  // Once Messages has been opened this session, the welcome banner is never needed.
+  const messagesOpened = !!state.showApps.messages;
+  useEffect(() => {
+    if (messagesOpened) markWelcomeNotificationShown();
+  }, [messagesOpened]);
 
   const toggleLaunchpad = (target: boolean): void => {
     const r = document.querySelector(`#launchpad`) as HTMLElement;
@@ -276,6 +286,15 @@ export default function Desktop(props: MacActions) {
       <div className="window-bound z-10 absolute" style={{ top: minMarginY }}>
         {renderAppWindows()}
       </div>
+
+      {/* One-time "Ash AI" welcome banner (top right, below the menu bar) */}
+      <WelcomeNotification
+        messagesOpened={messagesOpened}
+        onOpen={() => {
+          openApp("messages");
+          window.dispatchEvent(new Event(SHOW_AI_EVENT));
+        }}
+      />
 
       {/* Spotlight */}
       {state.spotlight && (

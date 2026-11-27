@@ -6,7 +6,7 @@ It serves two conversations:
 
 | Route | Conversation | What it does |
 |---|---|---|
-| `POST /chat` | **Ashish AI** (opens by default) | Gemini answers questions using only approved portfolio facts. Nothing is stored or emailed. |
+| `POST /chat` | **Ash AI** (opens by default) | Gemini answers questions using only approved portfolio facts. Nothing is stored or emailed. |
 | `POST /contact` | **Ashish Arora** | Validates a message and emails it to you through **Gmail SMTP** (App Password). The Gmail API (OAuth) and Resend adapters are kept as alternatives. |
 | `GET /health` | n/a | Reports modes and readiness only, never secret values. |
 
@@ -20,8 +20,11 @@ Browser (Messages app)
                                  TURNSTILE_SECRET_KEY
 ```
 
-Both routes start in **mock mode**. Mock mode never calls Gemini and never sends
-email, and the UI labels its replies as previews. With no endpoint configured at
+**Production:** the Worker is `portfolio-macos` and both routes are **live**;
+`wrangler.toml` matches, so a plain deploy keeps them live. The setup steps below
+describe the original first deploy, which started in **mock mode**. Mock mode
+never calls Gemini and never sends email, and the UI labels its replies as
+previews. With no endpoint configured at
 all, the site runs in a browser-only preview mode that sends nothing.
 
 ## Protections
@@ -83,7 +86,7 @@ Good to know:
 - Consumer Gmail allows about 500 recipients a day. The contact limit of 5 per
   IP per 10 minutes stays far below it.
 
-### 3. Gemini (Ashish AI)
+### 3. Gemini (Ash AI)
 
 - **Key:** create it in Google AI Studio (https://aistudio.google.com/apikey).
   New keys use the **`AQ.`** "auth key" format. The Worker sends the key in the
@@ -97,7 +100,7 @@ Good to know:
   numbers. Set `CHAT_DAILY_LIMIT` **below** your project's requests-per-day for
   that model.
 - **Billing:** a project with **no billing account** can't be charged. When the
-  quota runs out, visitors see "Ashish AI is busy" (Gemini returns 429).
+  quota runs out, visitors see "Ash AI is busy" (Gemini returns 429).
 - **Privacy:** Google's pricing page says free-tier content is *"Used to improve
   our products"*. The chat footer therefore asks visitors not to share personal
   details, and the Worker strips email addresses and phone numbers before
@@ -108,7 +111,7 @@ Good to know:
 Deploy once in mock mode first (step 5) so the Worker exists. Then use **either**
 method.
 
-**A. Cloudflare dashboard:** Workers & Pages → `portfolio-contact` → **Settings →
+**A. Cloudflare dashboard:** Workers & Pages → `portfolio-macos` → **Settings →
 Variables and Secrets** → **Add**. Set *Type* = **Secret**, enter the name and
 value, and select **Deploy**. Add these six:
 
@@ -155,7 +158,7 @@ dashboard *text* variables (but never secrets):
 2. Deploy in mock mode. The two `[[migrations]]` create both Durable Object classes.
    ```bash
    npx wrangler@3.114.17 deploy
-   curl https://portfolio-contact.<subdomain>.workers.dev/health
+   curl https://portfolio-macos.<subdomain>.workers.dev/health
    # {"ok":true,"mode":"mock","ready":true,"provider":"smtp","chat":{"mode":"mock","ready":true}}
    ```
 3. Add the secrets (step 4).
@@ -164,13 +167,13 @@ dashboard *text* variables (but never secrets):
    They're public values; never put secrets in `VITE_*` variables.
    - `VITE_CONTACT_ENDPOINT`: the Worker URL
    - `VITE_TURNSTILE_SITE_KEY`: the Turnstile site key
-5. **Turn on Ashish AI first, without editing files:**
+5. **Turn on Ash AI first, without editing files:**
    `npx wrangler@3.114.17 deploy --var CHAT_MODE:live`. `/health` must show
    `"chat":{"mode":"live","ready":true}`.
 6. **Then email:**
    `npx wrangler@3.114.17 deploy --var CHAT_MODE:live --var CONTACT_MODE:live`.
-   `/health` must show `"mode":"live","ready":true`. A plain
-   `npx wrangler@3.114.17 deploy` returns both services to mock mode. If `ready` is false, run
+   `/health` must show `"mode":"live","ready":true`. (Now that both modes are
+   `"live"` in `wrangler.toml`, a plain deploy keeps them live.) If `ready` is false, run
    `npx wrangler@3.114.17 tail`: it logs the missing setting **names**, never values.
 
 ### 6. Verify for real (required before trusting live mode)
@@ -216,7 +219,7 @@ first two is already in this Worker:
 2. **Resend**: `EMAIL_PROVIDER = "resend"` with `RESEND_API_KEY` and a
    `CONTACT_FROM_EMAIL` on a domain you verify with Resend.
 
-## Ashish AI: how it stays factual
+## Ash AI: how it stays factual
 
 - **Source of truth:** `src/portfolioFacts.ts`, compiled from the public portfolio
   pages and the public résumé. It leaves out the phone number, email addresses,
@@ -239,7 +242,7 @@ first two is already in this Worker:
   - Replies are cleaned of contact details and Markdown, and capped at 1,500
     characters.
 - **Clear labelling:** the AI has its own gradient avatar and an "AI" badge, and
-  every reply is captioned "Ashish AI · AI assistant". A "Contact Ashish" button
+  every reply is captioned "Ash AI · AI assistant". A "Contact Ashish" button
   switches to the real conversation.
 - **No email:** `/chat` has no access to the email transport.
 

@@ -1,6 +1,7 @@
 import type { KeyboardEvent } from "react";
 import { format } from "date-fns";
 import { user } from "~/configs";
+import { SHOW_AI_EVENT } from "~/configs/assistant";
 import AiThread, { AI_INTRO, AI_NAME, AiAvatar } from "./messages/AiThread";
 import ContactThread, {
   CONTACT_WELCOME,
@@ -11,7 +12,7 @@ type ConvoId = "ai" | "ashish";
 
 /**
  * Messages: two conversations in one window.
- *  - Ashish AI (default): AI assistant answering from approved portfolio facts.
+ *  - Ash AI (default): AI assistant answering from approved portfolio facts.
  *  - Ashish Arora: direct messages to the real Ashish, delivered by email.
  * Both threads stay mounted (only one is visible), so drafts, history and
  * verification state survive switching.
@@ -38,6 +39,14 @@ const Messages = () => {
   );
   const onAiPreview = useMemo(() => setPreview("ai"), [setPreview]);
   const onContactPreview = useMemo(() => setPreview("ashish"), [setPreview]);
+
+  // The welcome notification asks for Ash AI (even if this window is
+  // already open on the Ashish Arora conversation).
+  useEffect(() => {
+    const showAi = () => setActive("ai");
+    window.addEventListener(SHOW_AI_EVENT, showAi);
+    return () => window.removeEventListener(SHOW_AI_EVENT, showAi);
+  }, []);
 
   const contactAshish = useCallback(() => {
     setActive("ashish");

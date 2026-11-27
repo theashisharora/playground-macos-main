@@ -8,6 +8,8 @@ import {
   normalizeChatText,
   type ChatTurn
 } from "~/shared/chatProtocol";
+// Direct import: "~/configs" also loads apps.tsx, which imports Messages (cycle).
+import assistant from "~/configs/assistant";
 import { TURNSTILE_SITE_KEY } from "~/services/contact";
 import { chatConfigured, sendChatMessage } from "~/services/chat";
 import type { ThreadPreview } from "./ContactThread";
@@ -26,21 +28,22 @@ interface AiMessage {
   preview?: boolean;
 }
 
-export const AI_NAME = "Ashish AI";
+export const AI_NAME = assistant.name;
 export const AI_INTRO =
-  "Hi! I'm Ashish AI, an AI assistant (not Ashish himself). I can answer questions about Ashish's experience, projects, skills and education, using only his public portfolio. What would you like to know?";
+  "Hi! I'm Ash AI, an AI assistant (not Ashish himself). I can answer questions about Ashish's experience, projects, skills and education, using only his public portfolio. What would you like to know?";
 
 let seq = 0;
 const nextId = () => `ai-${Date.now().toString(36)}-${++seq}`;
 
-/** The gradient "AI" avatar, distinct from Ashish's photo. */
+/** Ash AI's own avatar, distinct from Ashish's photo. */
 export const AiAvatar = ({ big = false }: { big?: boolean }) => (
-  <span
-    className={`msg-ai-avatar ${big ? "size-10 text-lg" : "size-7 text-sm"}`}
+  <img
+    src={assistant.avatar}
+    alt=""
     aria-hidden="true"
-  >
-    <span className="i-ri:sparkling-2-fill" />
-  </span>
+    draggable={false}
+    className={`msg-ai-avatar ${big ? "size-10" : "size-7"}`}
+  />
 );
 
 interface Props {
@@ -48,7 +51,7 @@ interface Props {
   onContact: () => void;
 }
 
-/** "Ashish AI": Gemini-powered assistant limited to approved portfolio facts. */
+/** "Ash AI": Gemini-powered assistant limited to approved portfolio facts. */
 const AiThread = ({ onPreview, onContact }: Props) => {
   const dark = useStore((state) => state.dark) as boolean;
   const [messages, setMessages] = useState<AiMessage[]>([]);
