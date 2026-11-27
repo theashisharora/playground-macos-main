@@ -352,6 +352,31 @@ test("origins are matched exactly (no prefix/suffix tricks)", async () => {
   assert.equal(ok.status, 200);
 });
 
+test("domain transition: both production origins allowed, each echoed exactly", async () => {
+  const env: Env = {
+    ...liveEnv,
+    ALLOWED_ORIGINS:
+      "https://ashisharora.vercel.app,https://portfolio-macos-psi.vercel.app"
+  };
+  for (const origin of [
+    "https://ashisharora.vercel.app",
+    "https://portfolio-macos-psi.vercel.app"
+  ]) {
+    const res = await handleRequest(post(payload(), { Origin: origin }), env, deps());
+    assert.equal(res.status, 200, origin);
+    assert.equal(res.headers.get("Access-Control-Allow-Origin"), origin);
+  }
+  for (const origin of [
+    "https://ashisharora-git-main-someone.vercel.app",
+    "https://www.ashisharora.site",
+    "https://ashisharora.vercel.app.evil.example"
+  ]) {
+    const res = await handleRequest(post(payload(), { Origin: origin }), env, deps());
+    assert.equal(res.status, 403, origin);
+    assert.equal(res.headers.get("Access-Control-Allow-Origin"), null, origin);
+  }
+});
+
 test("health endpoint reveals readiness, not secrets", async () => {
   const res = await handleRequest(
     new Request("https://worker.example/health"),

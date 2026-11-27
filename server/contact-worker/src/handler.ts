@@ -65,7 +65,7 @@ export interface Env {
    */
   CONTACT_RATE_LIMITER?: RateLimitBinding;
 
-  // ---- Ashish AI (POST /chat) ----
+  // ---- Ash AI (POST /chat) ----
   /** "live" calls Gemini; anything else returns a labelled preview reply. */
   CHAT_MODE?: string;
   /** Secret: Gemini API key (ideally from a project without billing). */
@@ -250,7 +250,7 @@ export async function handleRequest(
 
   const ip = req.headers.get("CF-Connecting-IP");
 
-  // Ashish AI has its own bot check, limits and Durable Object namespace.
+  // Ash AI has its own bot check, limits and Durable Object namespace.
   if (route === "chat") return handleChat(body, ip, env, cors, deps.chat);
 
   // Honeypot: a hidden field real visitors never see. Fail honestly.

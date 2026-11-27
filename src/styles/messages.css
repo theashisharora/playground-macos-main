@@ -67,11 +67,120 @@
   @apply flex items-center gap-2 px-4 h-12 shrink-0 border-b border-c-300 bg-gray-50/90 dark:bg-[#2a2a2a];
 }
 
-/* ---- Ashish AI ---- */
+/* ---- Ash AI welcome notification (macOS banner) ---- */
+
+.welcome-notice {
+  @apply fixed right-2 z-[15] w-86 max-w-[calc(100vw-16px)]
+    rounded-2xl text-black dark:text-white
+    bg-white/75 dark:bg-[#2a2a2c]/75 backdrop-blur-2xl backdrop-saturate-150
+    border border-black/10 dark:border-white/15
+    shadow-[0_8px_28px_rgba(0,0,0,0.22)];
+  animation: welcome-notice-in 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+.welcome-notice-leaving {
+  animation: welcome-notice-out 0.25s ease-in both;
+}
+
+@keyframes welcome-notice-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(100% + 16px));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes welcome-notice-out {
+  to {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-notice {
+    animation: welcome-notice-fade 0.2s linear both;
+  }
+  .welcome-notice-leaving {
+    animation: welcome-notice-out 0.15s linear both;
+  }
+  @keyframes welcome-notice-out {
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes welcome-notice-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.welcome-notice-main {
+  @apply flex items-start gap-2.5 w-full p-3 pr-4 text-left rounded-2xl cursor-default
+    focus-visible:(outline-2 outline-offset-2 outline-[#007aff]);
+}
+
+.welcome-notice-icon {
+  @apply relative shrink-0 size-10;
+}
+
+.welcome-notice-icon > img:first-child {
+  @apply size-10 rounded-full object-cover bg-[#e9e9eb] dark:bg-[#3a3a3c];
+}
+
+.welcome-notice-badge {
+  @apply absolute -right-1 -bottom-1 size-4.5 rounded-[5px] drop-shadow;
+}
+
+.welcome-notice-body {
+  @apply flex flex-col min-w-0 flex-1 leading-snug;
+}
+
+.welcome-notice-head {
+  @apply flex items-baseline justify-between gap-2;
+}
+
+.welcome-notice-title {
+  @apply text-[13px] font-semibold truncate;
+}
+
+.welcome-notice-time {
+  @apply text-[11px] shrink-0 text-black/50 dark:text-white/50;
+}
+
+.welcome-notice-text {
+  @apply text-[13px] text-black/85 dark:text-white/85 line-clamp-4;
+}
+
+/* macOS shows the close button on hover; keep it reachable by keyboard and touch. */
+.welcome-notice-close {
+  @apply absolute -left-2 -top-2 size-5 rounded-full flex-center text-xs
+    text-black/70 dark:text-white/80 bg-[#f2f2f2] dark:bg-[#4a4a4c]
+    border border-black/10 dark:border-white/15 shadow
+    opacity-0 transition-opacity
+    focus-visible:(opacity-100 outline-2 outline-offset-1 outline-[#007aff]);
+}
+
+.welcome-notice:hover .welcome-notice-close,
+.welcome-notice:focus-within .welcome-notice-close {
+  @apply opacity-100;
+}
+
+@media (hover: none) {
+  .welcome-notice-close {
+    @apply opacity-100 size-7 text-sm -left-1.5 -top-1.5;
+  }
+}
+
+/* ---- Ash AI ---- */
 
 .msg-ai-avatar {
-  @apply inline-flex items-center justify-center rounded-full shrink-0 text-white;
-  background: linear-gradient(135deg, #8b5cf6 0%, #3b82f6 55%, #ec4899 100%);
+  @apply block rounded-full shrink-0 object-cover select-none bg-[#e9e9eb] dark:bg-[#3a3a3c];
 }
 
 .msg-row-in > .msg-ai-avatar {

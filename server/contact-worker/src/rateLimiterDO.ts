@@ -35,7 +35,7 @@ export class ContactRateLimiter extends DurableObject {
 }
 
 /**
- * Same logic, separate class, so Ashish AI usage lives in its own Durable
+ * Same logic, separate class, so Ash AI usage lives in its own Durable
  * Object namespace and can never exhaust the contact form's limits.
  */
 export class ChatRateLimiter extends ContactRateLimiter {}

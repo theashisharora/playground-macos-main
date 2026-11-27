@@ -262,7 +262,7 @@ export function memoryRateLimiter(
   };
 }
 
-// ---------- Ashish AI usage limits (separate from the contact quota) ----------
+// ---------- Ash AI usage limits (separate from the contact quota) ----------
 
 /** Per-IP chat limits plus a global daily cap that keeps Gemini usage bounded. */
 export const CHAT_RATE = {
