@@ -56,7 +56,7 @@ Computer Systems Technology, Information Systems Engineering\
 - Email: [arashish@sheridancollege.ca](mailto:arashish@sheridancollege.ca)
 - GitHub: [@theashisharora](https://github.com/theashisharora)
 - LinkedIn: [theashisharora2314](https://www.linkedin.com/in/theashisharora2314/)
-- Website: [ashisharora.site](https://www.ashisharora.site/)
+- Website: [ashisharora.site](https://ashisharora.vercel.app/)
 
 ## Résumé
 
