@@ -14,10 +14,10 @@ interface LaunchpadEntry {
   appId?: string;
 }
 
-// Built-in desktop apps flagged for Launchpad come first, then external links.
+// All built-in desktop apps come first, then external shortcuts.
 const entries: LaunchpadEntry[] = [
   ...apps
-    .filter((a) => a.launchpad && a.desktop)
+    .filter((a) => a.desktop)
     .map((a) => ({ id: a.id, title: a.title, img: a.img, appId: a.id })),
   ...launchpadApps
 ];
@@ -98,7 +98,10 @@ export default function Launchpad({ show, toggleLaunchpad, openApp }: LaunchpadP
                   href={app.link}
                   target="_blank"
                   rel="noreferrer"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleLaunchpad(false);
+                  }}
                 >
                   <img src={app.img} alt={app.title} title={app.title} />
                 </a>

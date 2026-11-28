@@ -74,7 +74,7 @@ export default function Desktop(props: MacActions) {
       };
     });
 
-    setState({ ...state, showApps, appsZ, maxApps, minApps });
+    setState((prev) => ({ ...prev, showApps, appsZ, maxApps, minApps }));
   };
 
   useEffect(() => {
@@ -101,11 +101,11 @@ export default function Desktop(props: MacActions) {
       r.style.transition = "ease-out 0.2s";
     }
 
-    setState({ ...state, showLaunchpad: target });
+    setState((prev) => ({ ...prev, showLaunchpad: target }));
   };
 
   const toggleSpotlight = (): void => {
-    setState({ ...state, spotlight: !state.spotlight });
+    setState((prev) => ({ ...prev, spotlight: !prev.spotlight }));
   };
 
   const setWindowPosition = (id: string): void => {
@@ -124,24 +124,21 @@ export default function Desktop(props: MacActions) {
   };
 
   const setAppMax = (id: string, target?: boolean): void => {
-    const maxApps = state.maxApps;
-    if (target === undefined) target = !maxApps[id];
-    maxApps[id] = target;
-    setState({
-      ...state,
-      maxApps: maxApps,
-      hideDockAndTopbar: target
+    setState((prev) => {
+      const maximized = target ?? !prev.maxApps[id];
+      return {
+        ...prev,
+        maxApps: { ...prev.maxApps, [id]: maximized },
+        hideDockAndTopbar: maximized
+      };
     });
   };
 
   const setAppMin = (id: string, target?: boolean): void => {
-    const minApps = state.minApps;
-    if (target === undefined) target = !minApps[id];
-    minApps[id] = target;
-    setState({
-      ...state,
-      minApps: minApps
-    });
+    setState((prev) => ({
+      ...prev,
+      minApps: { ...prev.minApps, [id]: target ?? !prev.minApps[id] }
+    }));
   };
 
   const minimizeApp = (id: string): void => {
@@ -166,67 +163,50 @@ export default function Desktop(props: MacActions) {
   };
 
   const closeApp = (id: string): void => {
-    setAppMax(id, false);
-    const showApps = state.showApps;
-    showApps[id] = false;
-    setState({
-      ...state,
-      showApps: showApps,
+    setState((prev) => ({
+      ...prev,
+      showApps: { ...prev.showApps, [id]: false },
+      maxApps: { ...prev.maxApps, [id]: false },
+      minApps: { ...prev.minApps, [id]: false },
       hideDockAndTopbar: false
-    });
+    }));
   };
 
-  const openApp = (id: string, opts: { closeLaunchpad?: boolean } = {}): void => {
-    // Close Launchpad in the same state update (separate setState calls from
-    // one render would overwrite each other).
-    const launchpadPatch = opts.closeLaunchpad ? { showLaunchpad: false } : {};
-    if (opts.closeLaunchpad) {
-      const lp = document.querySelector(`#launchpad`) as HTMLElement | null;
-      if (lp) {
-        lp.style.transform = "scale(1.1)";
-        lp.style.transition = "ease-out 0.2s";
-      }
-    }
-
-    // add it to the shown app list
-    const showApps = state.showApps;
-    showApps[id] = true;
-
-    // move to the top (use a maximum z-index)
-    const appsZ = state.appsZ;
-    const maxZ = state.maxZ + 1;
-    appsZ[id] = maxZ;
-
-    // get the title of the currently opened app
-    const currentApp = apps.find((app) => {
-      return app.id === id;
-    });
+  const openApp = (id: string): void => {
+    const currentApp = apps.find((app) => app.id === id);
     if (currentApp === undefined) {
       throw new TypeError(`App ${id} is undefined.`);
     }
 
-    setState({
-      ...state,
-      showApps: showApps,
-      appsZ: appsZ,
-      maxZ: maxZ,
-      currentTitle: currentApp.title,
-      ...launchpadPatch
-    });
+    // Every entry point (Launchpad, Dock, Spotlight, window focus) dismisses
+    // Launchpad. Keep the existing scale transition and window restore motion.
+    const lp = document.getElementById("launchpad");
+    if (lp) {
+      lp.style.transform = "scale(1.1)";
+      lp.style.transition = "ease-out 0.2s";
+    }
 
-    const minApps = state.minApps;
     // if the app has already been shown but minimized
-    if (minApps[id]) {
+    if (state.minApps[id]) {
       // move to window's last position
       const r = document.querySelector(`#window-${id}`) as HTMLElement;
       r.style.transform = `translate(${r.style.getPropertyValue(
         "--window-transform-x"
       )}, ${r.style.getPropertyValue("--window-transform-y")}) scale(1)`;
       r.style.transition = "ease-in 0.3s";
-      // remove it from the minimized app list
-      minApps[id] = false;
-      setState({ ...state, minApps, ...launchpadPatch });
     }
+
+    // One immutable update uses the latest state, including any other updates
+    // batched during this click. Existing app IDs keep their mounted window.
+    setState((prev) => ({
+      ...prev,
+      showApps: { ...prev.showApps, [id]: true },
+      appsZ: { ...prev.appsZ, [id]: prev.maxZ + 1 },
+      minApps: { ...prev.minApps, [id]: false },
+      maxZ: prev.maxZ + 1,
+      currentTitle: currentApp.title,
+      showLaunchpad: false
+    }));
   };
 
   const renderAppWindows = () => {
@@ -264,7 +244,9 @@ export default function Desktop(props: MacActions) {
 
   return (
     <div
-      className="size-full overflow-hidden bg-center bg-cover"
+      // Clip oversized drag bounds without allowing focus to scroll the desktop
+      // when a Launchpad button becomes hidden during application activation.
+      className="size-full overflow-clip bg-center bg-cover"
       style={{
         backgroundImage: `url(${dark ? wallpapers.night : wallpapers.day})`,
         filter: `brightness( ${(brightness as number) * 0.7 + 50}% )`
@@ -310,7 +292,7 @@ export default function Desktop(props: MacActions) {
       <Launchpad
         show={state.showLaunchpad}
         toggleLaunchpad={toggleLaunchpad}
-        openApp={(id) => openApp(id, { closeLaunchpad: true })}
+        openApp={openApp}
       />
 
       {/* Dock */}

@@ -30,6 +30,37 @@ Build for production into the `dist` folder:
 pnpm build
 ```
 
+## Small-screen routing
+
+Initial viewports narrower than 768 CSS pixels go to the independent classic
+portfolio at `https://ashisharora.vercel.app/` before the login screen mounts.
+Set `VITE_CLASSIC_PORTFOLIO_URL` to configure that destination. Invalid, non-HTTPS,
+and same-origin destinations leave visitors on the macOS portfolio.
+
+Use `?desktop=1` to keep the macOS experience for the current tab's browser
+session, including refreshes and subsequent visits without the query parameter.
+Resizing or rotating an already loaded page never triggers a redirect. Width is
+measured in CSS pixels: 768px tablets and wider phone landscape viewports stay
+on macOS; narrow desktop windows and zoomed initial viewports below 768px use
+classic unless overridden. No device or user-agent sniffing is involved.
+
+## Local regression checks
+
+Run the redirect tests with Node 22 or later:
+
+```bash
+node --experimental-strip-types --test tests/mobileRedirect.test.ts
+```
+
+After `pnpm build`, start `pnpm serve --port 4173` and run
+`node tests/portfolio.browser.mjs` with Playwright and Chrome available. The
+`PLAYWRIGHT_MODULE` environment variable can point to the file URL of an existing
+Playwright `index.mjs`, allowing temporary tooling outside the project without
+changing application dependencies. `PORTFOLIO_TEST_URL` overrides the local URL.
+Set `PORTFOLIO_CHECK_PUBLIC=1` to also check the real classic portfolio; other
+external navigation is stubbed so the regression suite does not exercise other
+projects. Screenshots are saved to the ignored `.cache/` directory.
+
 ## Personalizing
 
 | What | Where |
