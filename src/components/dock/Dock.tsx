@@ -25,10 +25,7 @@ export default function Dock({
 
   const openApp = (id: string) => {
     if (id === "launchpad") toggleLaunchpad(!showLaunchpad);
-    else {
-      toggleLaunchpad(false);
-      open(id);
-    }
+    else open(id);
   };
 
   const mouseX = useMotionValue<number | null>(null);

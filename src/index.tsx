@@ -4,6 +4,8 @@ import { createRoot } from "react-dom/client";
 import Desktop from "~/pages/Desktop";
 import Login from "~/pages/Login";
 import Boot from "~/pages/Boot";
+import { classicPortfolioUrl, desktopMinWidth } from "~/configs/portfolio";
+import { redirectSmallViewport } from "~/utils/mobileRedirect";
 
 import "@unocss/reset/tailwind.css";
 import "uno.css";
@@ -63,11 +65,13 @@ export default function App() {
   }
 }
 
-const rootElement = document.getElementById("root") as HTMLElement;
-const root = createRoot(rootElement);
-
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+// Decide before mounting Login, so mobile visitors never see a login-screen flash.
+if (!redirectSmallViewport(classicPortfolioUrl, desktopMinWidth)) {
+  const rootElement = document.getElementById("root") as HTMLElement;
+  const root = createRoot(rootElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+}
