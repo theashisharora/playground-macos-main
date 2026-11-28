@@ -180,6 +180,9 @@ const fixImageURL = (text: string, contentURL: string): string => {
 const Content = ({ contentID, contentURL }: ContentProps) => {
   const [storeMd, setStoreMd] = useState<{ [key: string]: string }>({});
   const dark = useStore((state) => state.dark);
+  // Window focus renders again on mousedown. Keep link components mounted
+  // through mouseup so the browser can complete the link's click/navigation.
+  const markdownComponents = useMemo(() => Highlighter(dark as boolean), [dark]);
 
   const fetchMarkdown = useCallback(
     (id: string, url: string) => {
@@ -212,7 +215,7 @@ const Content = ({ contentID, contentURL }: ContentProps) => {
           rehypeKatex,
           [rehypeExternalLinks, { target: "_blank", rel: "noopener noreferrer" }]
         ]}
-        components={Highlighter(dark as boolean)}
+        components={markdownComponents}
       >
         {storeMd[contentID]}
       </ReactMarkdown>
